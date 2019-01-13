@@ -25,6 +25,7 @@ import io.github.droidkaigi.confsched2019.session.ui.store.SessionPageStore
 import io.github.droidkaigi.confsched2019.session.ui.store.SessionPagesStore
 import io.github.droidkaigi.confsched2019.session.ui.widget.DaggerFragment
 import io.github.droidkaigi.confsched2019.session.ui.widget.SessionsItemDecoration
+import io.github.droidkaigi.confsched2019.session.ui.widget.TimeTableLayoutManager
 import io.github.droidkaigi.confsched2019.widget.BottomSheetBehavior
 import me.tatarka.injectedvmprovider.InjectedViewModelProviders
 import me.tatarka.injectedvmprovider.ktx.injectedViewModelProvider
@@ -70,10 +71,17 @@ class BottomSheetDaySessionsFragment : DaggerFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        val density = requireContext().resources.displayMetrics.density
+        val pxPerHour = (200 * density).toInt()
+        binding.sessionsRecycler.layoutManager = TimeTableLayoutManager((200 * density).toInt(), pxPerHour / 60) {
+            val item = groupAdapter.getItem(it)
+            val session = (item as? SpeechSessionItem)?.speechSession ?: (item as ServiceSessionItem).serviceSession
+            TimeTableLayoutManager.SessionInfo(session.startTime.minutes, session.endTime.minutes)
+        }
         binding.sessionsRecycler.adapter = groupAdapter
-        binding.sessionsRecycler.addItemDecoration(
-            SessionsItemDecoration(requireContext(), groupAdapter)
-        )
+//        binding.sessionsRecycler.addItemDecoration(
+//            SessionsItemDecoration(requireContext(), groupAdapter)
+//        )
 
         val onFilterButtonClick: (View) -> Unit = {
             sessionPageActionCreator.toggleFilterExpanded(SessionPage.pageOfDay(args.day))

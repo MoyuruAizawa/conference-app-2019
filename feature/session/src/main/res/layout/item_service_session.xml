@@ -18,13 +18,10 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:foreground="?android:attr/selectableItemBackground"
-        android:paddingTop="@dimen/session_item_top_padding"
-        android:paddingBottom="34dp"
-        android:paddingEnd="0dp"
-        android:paddingStart="@dimen/session_bottom_sheet_left_time_space"
+        android:padding="@dimen/session_item_top_padding"
         >
 
         <TextView

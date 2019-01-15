@@ -36,9 +36,7 @@ class SpeechSessionItem @AssistedInject constructor(
     navController: NavController,
     sessionContentsActionCreator: SessionContentsActionCreator,
     val systemStore: SystemStore
-) : BindableItem<ItemSessionBinding>(
-    session.id.hashCode().toLong()
-), SessionItem {
+) : BindableItem<ItemSessionBinding>(session.id.hashCode().toLong()), SessionItem {
     val speechSession get() = session
 
     @AssistedInject.Factory
@@ -50,9 +48,6 @@ class SpeechSessionItem @AssistedInject constructor(
         ): SpeechSessionItem
     }
 
-    private val onFavoriteClickListener: (Session.SpeechSession) -> Unit = { session ->
-        sessionContentsActionCreator.toggleFavorite(session)
-    }
     private val onClickListener: (Session.SpeechSession) -> Unit = { session ->
         navController
             .navigate(
@@ -69,9 +64,6 @@ class SpeechSessionItem @AssistedInject constructor(
             session = speechSession
             lang = defaultLang()
             addPaddingForTime = this@SpeechSessionItem.addPaddingForTime
-            favorite.setOnClickListener {
-                onFavoriteClickListener(speechSession)
-            }
             @Suppress("StringFormatMatches") // FIXME
             timeAndRoom.text = root.context.getString(
                 R.string.session_duration_room_format,
@@ -81,10 +73,6 @@ class SpeechSessionItem @AssistedInject constructor(
             categoryChip.text = speechSession.category.name.getByLang(systemStore.lang)
 
             bindSpeaker()
-
-            speechSession.message?.let { message ->
-                this@with.message.text = message.getByLang(systemStore.lang)
-            }
         }
     }
 

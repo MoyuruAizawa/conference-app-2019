@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.View
@@ -499,8 +500,10 @@ class BottomSheetBehavior<V : View> : Behavior<V> {
             // Scrolling view is a descendent of the sheet and scrolling vertically.
             // Let's follow along!
             nestedScrollingChildRef = WeakReference(target)
+            Log.i("TAG", "onStartNestedScroll return true")
             return true
         }
+        Log.i("TAG", "onStartNestedScroll return false")
         return false
     }
 
@@ -514,9 +517,11 @@ class BottomSheetBehavior<V : View> : Behavior<V> {
         type: Int
     ) {
         if (type == ViewCompat.TYPE_NON_TOUCH) {
+            Log.i("TAG", "onNestedPreScroll fast return 1")
             return // Ignore fling here
         }
         if (target != nestedScrollingChildRef?.get()) {
+            Log.i("TAG", "onNestedPreScroll fast return 2")
             return
         }
 
@@ -527,10 +532,12 @@ class BottomSheetBehavior<V : View> : Behavior<V> {
                 consumed[1] = currentTop - getExpandedOffset()
                 ViewCompat.offsetTopAndBottom(child, -consumed[1])
                 setStateInternal(STATE_EXPANDED)
+                Log.i("TAG", "onNestedPreScroll 1")
             } else {
                 consumed[1] = dy
                 ViewCompat.offsetTopAndBottom(child, -dy)
                 setStateInternal(STATE_DRAGGING)
+                Log.i("TAG", "onNestedPreScroll 2")
             }
         } else if (dy < 0) { // Downward
             if (!target.canScrollVertically(-1)) {
@@ -538,10 +545,12 @@ class BottomSheetBehavior<V : View> : Behavior<V> {
                     consumed[1] = dy
                     ViewCompat.offsetTopAndBottom(child, -dy)
                     setStateInternal(STATE_DRAGGING)
+                    Log.i("TAG", "onNestedPreScroll 3")
                 } else {
                     consumed[1] = currentTop - collapsedOffset
                     ViewCompat.offsetTopAndBottom(child, -consumed[1])
                     setStateInternal(STATE_COLLAPSED)
+                    Log.i("TAG", "onNestedPreScroll 4")
                 }
             }
         }
@@ -557,12 +566,15 @@ class BottomSheetBehavior<V : View> : Behavior<V> {
     ) {
         if (child.top == getExpandedOffset()) {
             setStateInternal(STATE_EXPANDED)
+            Log.i("TAG", "onStopNestedScroll fast return 1")
             return
         }
         if (target != nestedScrollingChildRef?.get() || !nestedScrolled) {
+            Log.i("TAG", "onStopNestedScroll fast return 2")
             return
         }
 
+        Log.i("TAG", "onStopNestedScroll")
         settleBottomSheet(child, getYVelocity(), true)
         clearNestedScroll()
     }
@@ -574,11 +586,13 @@ class BottomSheetBehavior<V : View> : Behavior<V> {
         velocityX: Float,
         velocityY: Float
     ): Boolean {
-        return isDraggable &&
+        val a = isDraggable &&
             target == nestedScrollingChildRef?.get() &&
             (state != STATE_EXPANDED || super.onNestedPreFling(
                 coordinatorLayout, child, target, velocityX, velocityY
             ))
+        Log.i("TAG", "onNestedPreFling $a")
+        return a
     }
 
     private fun clearNestedScroll() {

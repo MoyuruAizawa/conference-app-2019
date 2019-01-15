@@ -11,9 +11,7 @@ import io.github.droidkaigi.confsched2019.session.ui.actioncreator.SessionConten
 class ServiceSessionItem @AssistedInject constructor(
     @Assisted override val session: Session.ServiceSession,
     sessionContentsActionCreator: SessionContentsActionCreator
-) : BindableItem<ItemServiceSessionBinding>(
-    session.id.hashCode().toLong()
-), SessionItem {
+) : BindableItem<ItemServiceSessionBinding>(session.id.hashCode().toLong()), SessionItem {
     val serviceSession get() = session
 
     @AssistedInject.Factory
@@ -21,10 +19,6 @@ class ServiceSessionItem @AssistedInject constructor(
         fun create(
             session: Session.ServiceSession
         ): ServiceSessionItem
-    }
-
-    private val onFavoriteClickListener: (Session.ServiceSession) -> Unit = { session ->
-        sessionContentsActionCreator.toggleFavorite(session)
     }
 
     override fun bind(viewBinding: ItemServiceSessionBinding, position: Int) {
@@ -37,9 +31,6 @@ class ServiceSessionItem @AssistedInject constructor(
                 serviceSession.timeInMinutes,
                 serviceSession.room.name
             )
-            favorite.setOnClickListener {
-                onFavoriteClickListener(serviceSession)
-            }
         }
     }
 

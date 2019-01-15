@@ -24,10 +24,10 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="200dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:foreground="?android:attr/selectableItemBackground"
         android:layout_marginBottom="30dp"
+        android:foreground="?android:attr/selectableItemBackground"
         android:padding="4dp"
         >
 
@@ -36,19 +36,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:background="@drawable/shape_live"
             android:fontFamily="@font/robotomono_medium"
+            android:paddingBottom="2dp"
+            android:paddingEnd="4dp"
+            android:paddingStart="4dp"
+            android:paddingTop="2dp"
             android:text="@string/session_live"
             android:textAllCaps="true"
-            android:background="@drawable/shape_live"
             android:textColor="@color/white"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
             android:textSize="10sp"
-            app:visibleGone="@{session.isOnGoing}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:visibleGone="@{session.isOnGoing}"
             tools:ignore="SmallSp"
             />
 
@@ -61,24 +61,10 @@
             android:text="@{session.title.getByLang(lang)}"
             android:textAlignment="viewStart"
             android:textAppearance="@style/TextAppearance.App.Subtitle1"
-            app:layout_constraintEnd_toStartOf="@id/favorite"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/live"
             tools:text="@sample/service_session.json/data/session_name"
-            />
-
-        <ImageView
-            android:id="@+id/favorite"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="4dp"
-            android:contentDescription="@string/session_description_favorite_image"
-            android:scaleType="centerInside"
-            android:src="@{session.isFavorited ? @drawable/ic_bookmark_black_24dp : @drawable/ic_bookmark_border_black_24dp}"
-            android:tint="@{session.isFavorited ? @color/colorPrimary : @color/gray1}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/title"
-            tools:src="@drawable/ic_bookmark_border_black_24dp"
             />
 
         <LinearLayout
@@ -109,7 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             app:chipSpacing="4dp"
-            app:layout_constraintEnd_toEndOf="@id/favorite"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/title"
             app:layout_constraintTop_toBottomOf="@id/time_and_room"
             >
@@ -162,48 +148,5 @@
                 tools:text="@sample/service_session.json/data/category"
                 />
         </com.google.android.material.chip.ChipGroup>
-
-
-        <androidx.emoji.widget.EmojiTextView
-            android:id="@+id/message"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:drawablePadding="6dp"
-            android:drawableStart="@drawable/ic_bug_report_border_orange_18dp"
-            android:ellipsize="end"
-            android:includeFontPadding="false"
-            android:maxLines="3"
-            android:textAlignment="viewStart"
-            android:textAppearance="@style/TextAppearance.App.Caption"
-            android:textColor="@color/colorPrimary"
-            app:visibleGone="@{session.message != null}"
-            app:layout_constraintEnd_toEndOf="@id/title"
-            app:layout_constraintStart_toStartOf="@id/title"
-            app:layout_constraintTop_toBottomOf="@id/chip_group"
-            tools:text="セッションフロアがHallからRoom1に変更になりました"
-            tools:visibility="visible"
-            />
-
-        <TextView
-            android:id="@+id/survey"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:drawablePadding="6dp"
-            android:drawableStart="@drawable/ic_rate_review_border_orange_18dp"
-            android:ellipsize="end"
-            android:includeFontPadding="false"
-            android:maxLines="1"
-            android:text="@string/session_go_to_survey"
-            android:textAlignment="viewStart"
-            android:textAppearance="@style/TextAppearance.App.Caption"
-            android:textColor="@color/colorSecondary"
-            app:visibleGone="@{session.isFinished}"
-            app:layout_constraintEnd_toEndOf="@id/title"
-            app:layout_constraintStart_toStartOf="@id/title"
-            app:layout_constraintTop_toBottomOf="@id/message"
-            tools:visibility="visible"
-            />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

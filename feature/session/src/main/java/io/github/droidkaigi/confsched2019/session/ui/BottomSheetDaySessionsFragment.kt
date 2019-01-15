@@ -5,8 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
+import com.soywiz.klock.DateTime
+import com.soywiz.klock.DateTimeTz
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.databinding.ViewHolder
@@ -24,7 +27,6 @@ import io.github.droidkaigi.confsched2019.session.ui.store.SessionContentsStore
 import io.github.droidkaigi.confsched2019.session.ui.store.SessionPageStore
 import io.github.droidkaigi.confsched2019.session.ui.store.SessionPagesStore
 import io.github.droidkaigi.confsched2019.session.ui.widget.DaggerFragment
-import io.github.droidkaigi.confsched2019.session.ui.widget.SessionsItemDecoration
 import io.github.droidkaigi.confsched2019.session.ui.widget.TimeTableLayoutManager
 import io.github.droidkaigi.confsched2019.widget.BottomSheetBehavior
 import me.tatarka.injectedvmprovider.InjectedViewModelProviders
@@ -72,12 +74,16 @@ class BottomSheetDaySessionsFragment : DaggerFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         val density = requireContext().resources.displayMetrics.density
-        val pxPerHour = (200 * density).toInt()
-        binding.sessionsRecycler.layoutManager = TimeTableLayoutManager((200 * density).toInt(), pxPerHour / 60) {
-            val item = groupAdapter.getItem(it)
-            val session = (item as? SpeechSessionItem)?.speechSession ?: (item as ServiceSessionItem).serviceSession
-            TimeTableLayoutManager.SessionInfo(session.startTime.minutes, session.endTime.minutes)
-        }
+        val pxPerHour = (300 * density).toInt()
+        binding.sessionsRecycler.layoutManager =
+            TimeTableLayoutManager((250 * density).toInt(), pxPerHour / 60) {
+                val item = groupAdapter.getItem(it)
+                val session = (item as? SpeechSessionItem)?.speechSession
+                    ?: (item as ServiceSessionItem).serviceSession
+                session.room
+                TimeTableLayoutManager.SessionInfo(session.startTime, session.endTime, session.room)
+            }
+//        binding.sessionsRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.sessionsRecycler.adapter = groupAdapter
 //        binding.sessionsRecycler.addItemDecoration(
 //            SessionsItemDecoration(requireContext(), groupAdapter)

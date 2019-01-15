@@ -131,15 +131,15 @@ class BottomSheetFavoriteSessionsFragment : DaggerFragment() {
     }
 
     private fun applyTitleText() {
-        val linearLayoutManager = binding.sessionsRecycler.layoutManager as LinearLayoutManager
-        val firstPosition = linearLayoutManager.findFirstVisibleItemPosition()
-        if (firstPosition == RecyclerView.NO_POSITION || firstPosition >= groupAdapter.itemCount) {
-            return
-        }
-        binding.sessionsBottomSheetTitle.text = (groupAdapter
-            .getItem(firstPosition) as SessionItem)
-            .session
-            .startDayText
+//        val linearLayoutManager = binding.sessionsRecycler.layoutManager as LinearLayoutManager
+//        val firstPosition = linearLayoutManager.findFirstVisibleItemPosition()
+//        if (firstPosition == RecyclerView.NO_POSITION || firstPosition >= groupAdapter.itemCount) {
+//            return
+//        }
+//        binding.sessionsBottomSheetTitle.text = (groupAdapter
+//            .getItem(firstPosition) as SessionItem)
+//            .session
+//            .startDayText
     }
 
     companion object {

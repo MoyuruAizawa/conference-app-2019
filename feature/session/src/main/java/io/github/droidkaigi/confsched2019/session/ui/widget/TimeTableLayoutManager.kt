@@ -4,6 +4,8 @@ import android.graphics.Rect
 import android.util.SparseArray
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.soywiz.klock.DateTime
+import io.github.droidkaigi.confsched2019.model.Room
 import kotlin.math.max
 import kotlin.math.min
 
@@ -13,17 +15,20 @@ class TimeTableLayoutManager(
     private val sessionLookUp: (position: Int) -> SessionInfo
 ) : RecyclerView.LayoutManager() {
 
-    class SessionInfo(val startEpochMin: Int, val endEpochMin: Int) {
+    class SessionInfo(startDateTime: DateTime, endDateTime: DateTime, val roomRoom: Room) {
+        val startEpochMin = (startDateTime.unixMillisLong / 1000 / 60).toInt()
+        val endEpochMin = (endDateTime.unixMillisLong / 1000 / 60).toInt()
         val durationMin = endEpochMin - startEpochMin
     }
-
-    private val columnCount = 9
 
     private val parentLeft get() = paddingLeft
     private val parentTop get() = paddingTop
     private val parentRight get() = width - paddingRight
     private val parentBottom get() = height - paddingBottom
 
+    private val columnCount = 9
+    private var endEpochMin = Int.MIN_VALUE
+    private var startEpochMin = Int.MAX_VALUE
     private val sessionList = SparseArray<SessionInfo>()
 
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
@@ -41,16 +46,16 @@ class TimeTableLayoutManager(
             return
         }
 
-        var lastMin = 0
+        startEpochMin = Int.MAX_VALUE
+        endEpochMin = Int.MIN_VALUE
         (0 until itemCount).forEach {
             val sessionInfo = sessionLookUp(it)
-            lastMin = max(lastMin, sessionInfo.endEpochMin)
+            startEpochMin = min(sessionInfo.startEpochMin, startEpochMin)
+            endEpochMin = max(sessionInfo.endEpochMin, endEpochMin)
             sessionList.put(it, sessionInfo)
         }
 
-        var offset = parentLeft
         for (position in 0 until itemCount) {
-            val columnNumber = position % columnCount
             val session = sessionList.get(position) ?: break
 
             val view = recycler.getViewForPosition(position)
@@ -58,13 +63,11 @@ class TimeTableLayoutManager(
             measureChildWithMargins(view, session)
             val width = getDecoratedMeasuredWidth(view)
             val height = getDecoratedMeasuredHeight(view)
-            val left = offset
-            val top = session.startEpochMin * pxPerMinute
+            val left = session.roomRoom.id * columnWidth
+            val top = (session.startEpochMin - startEpochMin) * pxPerMinute
             val right = left + width
             val bottom = top + height
             layoutDecoratedWithMargins(view, left, top, right, bottom)
-
-            offset = if (columnNumber == columnCount - 1) 0 else right
         }
     }
 
@@ -76,13 +79,12 @@ class TimeTableLayoutManager(
         if (dy == 0) return 0
 
         val scrollAmount = if (dy > 0) {
-            var bottom = 0
-            (childCount - columnCount until childCount)
-                .forEach { view -> getChildAt(view)?.let { bottom = max(bottom, getDecoratedBottom(it)) } }
+            val bottom = (childCount - columnCount until childCount)
+                .mapNotNull { getChildAt(it)?.let(this::getDecoratedBottom) }.min() ?: return 0
             if (bottom - dy < parentBottom) bottom - parentBottom else dy
         } else {
-            var top = 0
-            (0 until columnCount).forEach { view -> getChildAt(view)?.let { top = min(top, getDecoratedTop(it)) } }
+            val top = (0 until columnCount)
+                .mapNotNull { getChildAt(it)?.let(this::getDecoratedBottom) }.max() ?: return 0
             if (top - dy > parentTop) top - parentTop else dy
         }
 
@@ -103,6 +105,14 @@ class TimeTableLayoutManager(
 
         offsetChildrenHorizontal(-scrollAmount)
         return scrollAmount
+    }
+
+    override fun computeVerticalScrollRange(state: RecyclerView.State): Int {
+        return (endEpochMin - startEpochMin) * pxPerMinute
+    }
+
+    override fun computeVerticalScrollOffset(state: RecyclerView.State): Int {
+        return super.computeVerticalScrollOffset(state)
     }
 
     private fun measureChildWithMargins(view: View, session: SessionInfo) {
